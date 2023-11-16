@@ -18,7 +18,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet var windLabel : UILabel!
     @IBOutlet var imageView : UIImageView!
     
-    let apiURL = "https://api.openweathermap.org/data/2.5/weather?q=Waterloo,CA&appid=f37ff61254cea47efa9b35584609d346"
+//    let apiURL = "https://api.openweathermap.org/data/2.5/weather?q=Waterloo,CA&appid=f37ff61254cea47efa9b35584609d346"
     
     var locManager = CLLocationManager()
 
@@ -35,7 +35,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let loc = locations.first {
-            getWeatherInformation(for: loc)
+            print(loc.coordinate.latitude)
+            print(loc.coordinate.longitude)
+            getWeatherInformation(coordinates : loc)
+            
             locManager.stopUpdatingLocation()
         }
     }
@@ -44,8 +47,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         print("Location Manager Error: \(error.localizedDescription)")
     }
     
-    func getWeatherInformation(for: CLLocation) {
+    func getWeatherInformation(coordinates : CLLocation) {
+        let latitude = coordinates.coordinate.latitude
+        let longtitude = coordinates.coordinate.longitude
         
+        // lat = 43.466667
+        //lon = -80.51667
+        
+        let apiURL = "https://api.openweathermap.org/data/2.5/weather?lat=\(latitude)&lon=\(longtitude)&appid=f37ff61254cea47efa9b35584609d346"
+        
+        print(apiURL)
         guard let url = URL(string: apiURL) else {
             print("Invalid URL")
             return
@@ -76,8 +87,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             whetherConditionLabel.text = weather.description
 
             // Convert temperature to degrees Celsius
-            let temperatureInCelsius = weatherData.main.temp - 273.15
-            tempLabel.text = String(format: "%.1f°C", temperatureInCelsius)
+            let temperatureInCelsius = Int(weatherData.main.temp - 273.15)
+            tempLabel.text = "\(temperatureInCelsius)°C"
 
             // Display humidity in percentage
             humidityLabel.text = "Humidity: \(weatherData.main.humidity) %"
